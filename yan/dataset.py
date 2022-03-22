@@ -15,6 +15,7 @@ class MyDataSet(Dataset):
         return len(self.images_filepaths)
 
     def __getitem__(self, index):
+        # TODO 需自己修改
         image_filepath = self.images_filepaths[index]
         image = Image.open(os.path.join('./data/' + image_filepath))
         label = self.labels[index]

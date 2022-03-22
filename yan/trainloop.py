@@ -14,8 +14,8 @@ from yan.model import YCXNet
 
 
 class TrainLoop:
-    def __init__(self):
-        file = open(r'./config.yml', encoding='utf-8')
+    def __init__(self, config_path):
+        file = open(config_path, encoding='utf-8')
         # 初始化参数 不在其他地方初始化 避免混淆
         self.config = yaml.load(file, Loader=yaml.FullLoader)
         self.data_path = self.config["data"]["train_path"]
@@ -67,7 +67,8 @@ class TrainLoop:
         batch_idx = 0
         for data in tqdm(train_loader):
             inputs, target = data
-            # TODO 提示转化错误
+            # TODO windows提示转化错误
+            # print(target.dtype)
             target = target.type(torch.LongTensor)
             inputs, target = inputs.to(device), target.to(device)
             optimizer.zero_grad()
