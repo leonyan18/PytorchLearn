@@ -1,0 +1,13 @@
+train:
+  batch_size: 4
+  num_epochs: 10
+  batch_display: 30
+data:
+  train_path: ./data/train.csv
+model:
+  optimizer:
+    lr: 0.001
+    momentum: 0.5
+  scheduler:
+    decay_t: 5
+    decay_rate: 0.5
