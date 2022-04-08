@@ -8,6 +8,9 @@ from timm.data.transforms_factory import create_transform
 from timm.scheduler.step_lr import StepLRScheduler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+import torch.nn.functional as F
+import torchvision
+from torchvision import transforms
 
 from yan.dataset import MyDataSet
 from yan.model import YCXNet
@@ -29,16 +32,22 @@ class TrainLoop:
 
     def make_data(self):
         # TODO 划分验证集以及K折交叉
-        trans = create_transform(224)
-        df = pd.read_csv(self.data_path)
-        le = LabelEncoder()
-        df['label'] = le.fit_transform(df['label'])
-        # 划分训练集和测试级
-        x_train, x_test, y_train, y_test = train_test_split(df['image'], df['label'], test_size=0.2, random_state=0)
-        train_dataset = MyDataSet(x_train, y_train, trans)
-        test_dataset = MyDataSet(x_test, y_test, trans)
-        train_loader = DataLoader(train_dataset, batch_size=self.batch_size)
-        test_loader = DataLoader(test_dataset, batch_size=self.batch_size)
+        # trans = create_transform(224)
+        # df = pd.read_csv(self.data_path)
+        # le = LabelEncoder()
+        # df['label'] = le.fit_transform(df['label'])
+        # # 划分训练集和测试级
+        # x_train, x_test, y_train, y_test = train_test_split(df['image'], df['label'], test_size=0.2, random_state=0)
+        # train_dataset = MyDataSet(x_train, y_train, trans)
+        # test_dataset = MyDataSet(x_test, y_test, trans)
+        # train_loader = DataLoader(train_dataset, batch_size=self.batch_size)
+        # test_loader = DataLoader(test_dataset, batch_size=self.batch_size)
+        transformation = transforms.Compose([transforms.ToTensor(),
+                                             transforms.Normalize((0.1307,), (0.3081,))])
+        train_dataset = torchvision.datasets.MNIST('data/', train=True, transform=transformation, download=True)
+        test_dataset = torchvision.datasets.MNIST('data/', train=False, transform=transformation, download=True)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+        test_loader = DataLoader(test_dataset, batch_size=self.batch_size, shuffle=True)
         return train_loader, test_loader
 
     def run(self):
@@ -48,7 +57,8 @@ class TrainLoop:
             device = torch.device('cpu')
         # 选择自己的模型
         model = YCXNet()
-        criterion = torch.nn.CrossEntropyLoss()
+        # criterion = torch.nn.CrossEntropyLoss()
+        criterion = F.nll_loss
         # optimizer = torch.optim.SGD(model.parameters(), lr=self.lr, momentum=self.momentum)
         # 使用了timm的optimizer和scheduler
         optimizer = timm.optim.create_optimizer_v2(model, opt='lookahead_adam', lr=self.lr)

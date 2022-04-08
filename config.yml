@@ -1,7 +1,7 @@
 train:
   batch_size: 4
   num_epochs: 10
-  batch_display: 30
+  batch_display: 3000
 data:
   train_path: ./data/train.csv
 model:
