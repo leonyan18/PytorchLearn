@@ -10,5 +10,3 @@ print(ser)
 a = torch.randn(4,4)
 torch.nn.init.xavier_normal_(a,gain=1)
 print(a)
-
-
